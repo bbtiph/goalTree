@@ -17,7 +17,9 @@ import ReactFlow, {
   Edge,
 } from 'react-flow-renderer';
 
-import ColorSelectorNode from './ColorSelectorNode';
+import ChildCustomNode from './ChildCustomNode';
+import ParentCustomNode from './ParentCustomNode';
+import SuperParentCustomNode from "./SuperParentCustomNode";
 
 const onLoad = (reactFlowInstance: OnLoadParams) => console.log('flow loaded:', reactFlowInstance);
 const onNodeDragStop = (_: MouseEvent, node: Node) => console.log('drag stop', node);
@@ -26,73 +28,199 @@ const onElementClick = (_: MouseEvent, element: FlowElement) => console.log('cli
 const initBgColor = '#1A192B';
 
 const connectionLineStyle = { stroke: '#fff' };
+const edgeCustomStyle = { stroke: '#E9A600' };
 const snapGrid: SnapGrid = [16, 16];
 const nodeTypes = {
-  selectorNode: ColorSelectorNode,
+  child: ChildCustomNode,
+  parent: ParentCustomNode,
+  superParent: SuperParentCustomNode
 };
 
 const CustomNodeFlow = () => {
+  let isElements = [];
+  const obj = {
+    goalId: '1',
+    goalName: '123',
+    parentGoalId: null,
+    positionName: 'Достижение плана по производству концентрата - ## т металла в концентрате',
+    parentPositionName: null,
+    goalType: 'LIBRARY',
+    level: 1
+  }
+  isElements.push(obj);
+
+  const obj2 = {
+    goalId: '2',
+    goalName: '123',
+    parentGoalId: '3',
+    positionName: 'Рассмотрение инициатив по оцифровке и оптимизации эффективности отдела;',
+    parentPositionName: 'lfdf',
+    goalType: 'CASCADE',
+    level: 1
+  }
+  isElements.push(obj2);
+
+  const obj3 = {
+    goalId: '3',
+    goalName: '123',
+    parentGoalId: '4',
+    positionName: 'Производительность мельницы > ## т/ч: Экспертная оптимизация системы и стабильная работа фабрики.',
+    parentPositionName: 'sdnfksd',
+    goalType: 'CASCADE',
+    level: 2
+  }
+  isElements.push(obj3);
+
+  const obj4 = {
+    goalId: '4',
+    goalName: '123',
+    parentGoalId: null,
+    positionName: 'Выявление и уменьшение неликвидных активов. Организация контроля уровней поставок на складах',
+    parentPositionName: null,
+    goalType: 'CASCADE',
+    level: 3
+  }
+  isElements.push(obj4);
+
   const [elements, setElements] = useState<Elements>([]);
   const [bgColor, setBgColor] = useState<string>(initBgColor);
 
   useEffect(() => {
     const onChange = (event: ChangeEvent<HTMLInputElement>) => {
       setElements((els) =>
-        els.map((e) => {
-          if (isEdge(e) || e.id !== '2') {
-            return e;
-          }
+          els.map((e) => {
+            if (isEdge(e) || e.id !== '2') {
+              return e;
+            }
 
-          const color = event.target.value;
+            const color = event.target.value;
 
-          setBgColor(color);
+            setBgColor(color);
 
-          return {
-            ...e,
-            data: {
-              ...e.data,
-              color,
-            },
-          };
-        })
+            return {
+              ...e,
+              data: {
+                ...e.data,
+                color,
+              },
+            };
+          })
       );
     };
-
-    setElements([
-      {
-        id: '1',
-        type: 'input',
-        data: { label: 'An input node' },
-        position: { x: 0, y: 50 },
-        sourcePosition: Position.Right,
-      },
-      {
-        id: '2',
-        type: 'selectorNode',
-        data: { onChange: onChange, color: initBgColor },
-        style: { border: '1px solid #777', padding: 10 },
-        position: { x: 250, y: 50 },
-      },
-      {
-        id: '3',
-        type: 'output',
-        data: { label: 'Output A' },
-        position: { x: 550, y: 25 },
-        targetPosition: Position.Left,
-      },
-      {
-        id: '4',
-        type: 'output',
-        data: { label: 'Output B' },
-        position: { x: 550, y: 100 },
-        targetPosition: Position.Left,
-      },
-
-      { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#fff' } },
-      { id: 'e2a-3', source: '2', sourceHandle: 'a', target: '3', animated: true, style: { stroke: '#fff' } },
-      { id: 'e2b-4', source: '2', sourceHandle: 'b', target: '4', animated: true, style: { stroke: '#fff' } },
-    ]);
   }, []);
+  let counter = 0;
+  let counter1 = 0;
+  let counter2 = 0;
+
+  for (let i=0; i<isElements.length; i++) {
+    if (isElements[i].level == 1) {
+      counter++;
+      elements[i] = {
+        id: isElements[i].goalId,
+        type: 'child',
+        data: {
+          label: (
+              <>
+                {isElements[i].goalName}
+              </>
+          ),
+          text: (
+              <>
+                {isElements[i].positionName}
+              </>
+          ),
+        },
+        position: { x: 844, y: counter * 130 },
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right,
+        draggable: false
+      }
+    } else if (isElements[i].level == 2) {
+      counter1++;
+      elements[i] = {
+        id: isElements[i].goalId,
+        type: 'parent',
+        data: {
+          label: (
+              <>
+                {isElements[i].goalName}
+              </>
+          ),
+          text: (
+              <>
+                {isElements[i].positionName}
+              </>
+          ),
+        },
+        position: { x: 452, y: counter1 * 130 },
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right,
+        draggable: false
+      }
+    } else if (isElements[i].level == 3) {
+      counter2++;
+      elements[i] = {
+        id: isElements[i].goalId,
+        type: 'superParent',
+        data: {
+          label: (
+              <>
+                {isElements[i].goalName}
+              </>
+          ),
+          text: (
+              <>
+                {isElements[i].positionName}
+              </>
+          ),
+        },
+        position: { x: 60, y: counter2 * 130 },
+        targetPosition: Position.Left,
+        sourcePosition: Position.Right,
+        draggable: false
+      }
+    }
+  }
+  let z = counter + counter1 + counter2;
+  for (let i=0; i<isElements.length; i++) {
+    for (let j=0; j<isElements.length; j++) {
+      if (isElements[i].goalId == isElements[j].parentGoalId) {
+        elements[z] = {
+          id: isElements[i].goalId + '-' + isElements[j].parentGoalId,
+          source: isElements[i].goalId,
+          target: isElements[j].goalId,
+          type: 'smoothstep'
+        }
+        z++;
+      }
+    }
+  }
+
+  // let max=0;
+  // for (let i=0; i<isElements.length; i++) {
+  //   if (isElements[i].level > max) {
+  //     max = isElements[i].level;
+  //   }
+  // }
+  //
+  // while (1) {
+  //
+  //   while (1){
+  //     for (let i=0; i<isElements.length; i++) {
+  //       if (isElements[i].level==max && isElements[i].isUsed==false) {
+  //         isElements[i].isUsed = true;
+  //         let resGoalId = isElements[i].goalId;
+  //         for (let j=0; j<isElements.length; j++) {
+  //           if (isElements[j].parentGoalId == resGoalId){
+  //             isElements[j].isUsed = true;
+  //           }
+  //         }
+  //         break
+  //       }
+  //     }
+  //   }
+  //
+  // }
 
   const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params: Connection | Edge) =>
@@ -105,7 +233,6 @@ const CustomNodeFlow = () => {
       onElementsRemove={onElementsRemove}
       onConnect={onConnect}
       onNodeDragStop={onNodeDragStop}
-      style={{ background: bgColor }}
       onLoad={onLoad}
       nodeTypes={nodeTypes}
       connectionLineStyle={connectionLineStyle}

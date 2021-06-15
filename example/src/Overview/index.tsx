@@ -1,22 +1,26 @@
-import React, { useState, MouseEvent, CSSProperties } from 'react';
+import React, {CSSProperties, MouseEvent, useState} from 'react';
 
 import ReactFlow, {
-  removeElements,
   addEdge,
-  MiniMap,
-  Controls,
+  ArrowHeadType,
   Background,
-  isNode,
-  Node,
+  Connection,
+  Controls,
+  Edge,
   Elements,
   FlowElement,
-  OnLoadParams,
   FlowTransform,
+  isNode,
+  MiniMap,
+  Node,
+  OnLoadParams,
+  Position,
+  removeElements,
   SnapGrid,
-  ArrowHeadType,
-  Connection,
-  Edge,
 } from 'react-flow-renderer';
+
+import './index.css';
+import ColorSelectorNode from "./ColorSelectorNode";
 
 const onNodeDragStart = (_: MouseEvent, node: Node) => console.log('drag start', node);
 const onNodeDrag = (_: MouseEvent, node: Node) => console.log('drag', node);
@@ -47,95 +51,78 @@ const onEdgeMouseMove = (_: MouseEvent, edge: Edge) => console.log('edge mouse m
 const onEdgeMouseLeave = (_: MouseEvent, edge: Edge) => console.log('edge mouse leave', edge);
 const onEdgeDoubleClick = (_: MouseEvent, edge: Edge) => console.log('edge double click', edge);
 
+const nodeTypes = {
+  selectorNode: ColorSelectorNode,
+};
+
+
+
 const initialElements: Elements = [
   {
-    id: '1',
+    id: '0',
     type: 'input',
     data: {
       label: (
+          <>
+            <div>
+              <h3>
+                Достижение плана по <br/> производству концентрата - ## т <br/> металла в концентрате
+              </h3>
+            </div>
+          </>
+      ),
+    },
+    position: { x: -100, y: 0 },
+    targetPosition: Position.Left,
+    sourcePosition: Position.Right,
+    draggable: false
+  },
+  {
+    id: '1',
+    data: {
+      label: (
         <>
-          Welcome to <strong>React Flow!</strong>
+          <strong>Parent</strong>
         </>
       ),
     },
     position: { x: 250, y: 0 },
+    targetPosition: Position.Left,
+    sourcePosition: Position.Right,
+    draggable: false
   },
   {
     id: '2',
     data: {
       label: (
         <>
-          This is a <strong>default node</strong>
+          <strong>Child 1</strong>
         </>
       ),
     },
-    position: { x: 100, y: 100 },
+    position: { x: 600, y: 0 },
+    targetPosition: Position.Left,
+    sourcePosition: Position.Right,
+    draggable: false
   },
   {
     id: '3',
     data: {
       label: (
         <>
-          This one has a <strong>custom style</strong>
+          <strong>Child 2</strong>
         </>
       ),
     },
-    position: { x: 400, y: 100 },
-    style: { background: '#D6D5E6', color: '#333', border: '1px solid #222138', width: 180 },
+    position: { x: 600, y: 100 },
+    targetPosition: Position.Left,
+    sourcePosition: Position.Right,
+    draggable: false
   },
-  {
-    id: '4',
-    position: { x: 250, y: 200 },
-    data: {
-      label: (
-        <>
-          You can find the docs on{' '}
-          <a href="https://github.com/wbkd/react-flow" target="_blank" rel="noopener noreferrer">
-            Github
-          </a>
-        </>
-      ),
-    },
-  },
-  {
-    id: '5',
-    data: {
-      label: (
-        <>
-          Or check out the other <strong>examples</strong>
-        </>
-      ),
-    },
-    position: { x: 250, y: 325 },
-  },
-  {
-    id: '6',
-    type: 'output',
-    data: {
-      label: (
-        <>
-          An <strong>output node</strong>
-        </>
-      ),
-    },
-    position: { x: 100, y: 480 },
-  },
-  { id: '7', type: 'output', data: { label: 'Another output node' }, position: { x: 400, y: 450 } },
-  { id: 'e1-2', source: '1', target: '2', label: 'this is an edge label' },
-  { id: 'e1-3', source: '1', target: '3' },
-  { id: 'e3-4', source: '3', target: '4', animated: true, label: 'animated edge' },
-  { id: 'e4-5', source: '4', target: '5', arrowHeadType: ArrowHeadType.Arrow, label: 'edge with arrow head' },
-  { id: 'e5-6', source: '5', target: '6', type: 'smoothstep', label: 'smooth step edge' },
-  {
-    id: 'e5-7',
-    source: '5',
-    target: '7',
-    type: 'step',
-    style: { stroke: '#f6ab6c' },
-    label: 'a step edge',
-    animated: true,
-    labelStyle: { fill: '#f6ab6c', fontWeight: 700 },
-  },
+
+  { id: 'e1-1', source: '0', target: '1', type: 'smoothstep'},
+  { id: 'e1-2', source: '1', target: '2', type: 'smoothstep'},
+  { id: 'e1-3', source: '1', target: '3', type: 'smoothstep'},
 ];
 
 const connectionLineStyle: CSSProperties = { stroke: '#ddd' };
@@ -163,6 +150,7 @@ const OverviewFlow = () => {
 
   return (
     <ReactFlow
+      nodeTypes={nodeTypes}
       elements={elements}
       onElementClick={onElementClick}
       onElementsRemove={onElementsRemove}
